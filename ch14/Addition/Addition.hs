@@ -1,6 +1,7 @@
 module Addition where
 
 import Test.Hspec
+import Test.QuickCheck
 
 sayHello :: IO ()
 sayHello = putStrLn "hello!"
@@ -12,6 +13,8 @@ main = hspec $ do
       (1 + 1) > 1 `shouldBe` True
     it "2 + 2 is equal to 4" $ do
       2 + 2 `shouldBe` 4
+    it "x + 1 is always greater than x" $ do
+      property $ \x -> x + 1 > (x :: Int)
 
 
 rSum :: (Eq a, Num a) => a -> a -> a
