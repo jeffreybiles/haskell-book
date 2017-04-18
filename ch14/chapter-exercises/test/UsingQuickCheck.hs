@@ -1,7 +1,9 @@
 module UsingQuickCheck where
 
 import Test.QuickCheck
+import Test.QuickCheck.Function (apply, Fun(..))
 import Data.List (sort)
+import Data.Char (toUpper)
 
 quickCheckTests :: IO ()
 quickCheckTests = do
@@ -16,6 +18,12 @@ quickCheckTests = do
   -- quickCheck powAssociative --6
   -- quickCheck powCommutative --6
   quickCheck listReverse --7
+  quickCheck applicationOperator --8
+  -- quickCheck foldCons --9
+  quickCheck foldAppend --9
+  -- quickCheck lengthFunc --10
+  quickCheck roundTrip
+  quickCheck capitalizeIdempotence
 
 half x = x / 2
 halfIdentity = (*2) . half
@@ -65,3 +73,27 @@ powCommutative x y =
 
 listReverse :: [Int] -> Bool
 listReverse l = reverse (reverse l) == l
+
+applicationOperator :: Fun Int Int -> Int -> Bool
+applicationOperator (Fun _ f) a = (f a) == (f $ a)
+
+foldCons :: String -> String -> Bool
+foldCons arr arr2 = (foldr (:) arr arr2) == ((++) arr arr2)
+
+foldAppend :: [String] -> Bool
+foldAppend arr = (foldr (++) [] arr) == (concat arr)
+
+lengthFunc :: Int -> String -> Bool
+lengthFunc n xs = length (take n xs) == n
+
+roundTrip :: Int -> Bool
+roundTrip x = (read (show x)) == x
+
+twice f = f . f
+fourTimes = twice . twice
+capitalizeWord :: String -> String
+capitalizeWord [] = []
+capitalizeWord (x:xs) = toUpper x : xs
+
+capitalizeIdempotence :: String -> Bool
+capitalizeIdempotence x = (capitalizeWord x == twice capitalizeWord x) && (twice capitalizeWord x == fourTimes capitalizeWord x)
